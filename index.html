@@ -11,152 +11,173 @@
             width: 100%;
             height: 100%;
             background-color: #111111;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 10px;
+            box-sizing: border-box;
+            height: 100vh;
+            position: relative;
         }
         #viewport-container {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 84vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            overflow: hidden;
         }
-        .fullscreen-viewer {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
+        #catalogue-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border-radius: 4px;
         }
-        
-        /* Floating Navigation Controls */
-        .nav-arrow {
+        .click-zone {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(255, 87, 34, 0.85); /* Gorgeous gallery orange */
+            top: 0;
+            height: 100%;
+            width: 50%;
+            z-index: 25;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #left-zone { left: 0; }
+        #right-zone { right: 0; }
+
+        .nav-controls {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px 0;
+            background-color: #111111;
+            z-index: 30;
+        }
+        .nav-btn {
+            background-color: #ff5722;
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
+            padding: 10px 24px;
+            font-size: 0.95rem;
             font-weight: bold;
+            border-radius: 4px;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Forces arrows to sit on top of the InDesign content layout layer */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: background-color 0.2s, transform 0.2s;
+            transition: background 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .nav-arrow:hover {
-            background-color: rgba(230, 74, 25, 1);
-            transform: translateY(-50%) scale(1.05);
+        .nav-btn:hover {
+            background-color: #e64a19;
         }
-        .nav-arrow:active {
-            transform: translateY(-50%) scale(0.95);
+        .nav-btn:disabled {
+            background-color: #333;
+            color: #777;
+            cursor: not-allowed;
+            box-shadow: none;
         }
-        #prev-arrow {
-            left: 20px;
+        .page-select {
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 9px 18px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
         }
-        #next-arrow {
-            right: 20px;
-        }
-        
-        /* Bottom Page Indicator HUD */
-        #page-hud {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(26, 26, 26, 0.9);
-            color: #ffffff;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            z-index: 9999;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            border: 1px solid #333;
-        }
-
-        /* Mobile Optimization adjustments */
         @media (max-width: 768px) {
-            .nav-arrow {
-                width: 45px;
-                height: 45px;
-                font-size: 1.2rem;
-                background-color: rgba(255, 87, 34, 0.95);
+            #viewport-container {
+                height: 76vh;
             }
-            #prev-arrow { left: 10px; }
-            #next-arrow { right: 10px; }
-            #page-hud { bottom: 15px; padding: 6px 16px; font-size: 0.8rem; }
+            .nav-controls {
+                padding: 15px 0 30px 0;
+            }
+            .nav-btn {
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="viewport-container">
-        <!-- Floating Clickable Action Anchors -->
-        <button id="prev-arrow" class="nav-arrow">❮</button>
-        <button id="next-arrow" class="nav-arrow">❯</button>
-        
-        <!-- Center Information HUD Dashboard -->
-        <div id="page-hud">Page 1 of 17</div>
+    <div id="main-container">
+        <div id="viewport-container">
+            <div id="left-zone" class="click-zone"></div>
+            <div id="right-zone" class="click-zone"></div>
+            <img id="catalogue-img" src="" alt="Exhibition Catalogue Page">
+        </div>
 
-        <!-- Embedded Content Engine -->
-        <iframe 
-            id="publication-frame"
-            src="publication-web-resources/html/publication.html" 
-            class="fullscreen-viewer" 
-            allowfullscreen>
-        </iframe>
+        <div class="nav-controls">
+            <button id="prev-page-btn" class="nav-btn">◀ Previous</button>
+            <select id="page-dropdown" class="page-select"></select>
+            <button id="next-page-btn" class="nav-btn">Next ▶</button>
+        </div>
     </div>
 
     <script>
         const totalPages = 17;
         let currentPage = 1;
         
-        const frame = document.getElementById('publication-frame');
-        const hud = document.getElementById('page-hud');
-        const prevBtn = document.getElementById('prev-arrow');
-        const nextBtn = document.getElementById('next-arrow');
+        const dropdown = document.getElementById('page-dropdown');
+        const prevBtn = document.getElementById('prev-page-btn');
+        const nextBtn = document.getElementById('next-page-btn');
+        const catalogueImg = document.getElementById('catalogue-img');
+        const leftZone = document.getElementById('left-zone');
+        const rightZone = document.getElementById('right-zone');
 
-        function turnToPage(targetPage) {
-            currentPage = targetPage;
-            
-            // Updates the tracking display HUD text strings safely
-            hud.textContent = `Page ${currentPage} of ${totalPages}`;
-            
-            // Generates a clean cache-busting link identity sequence to force frame processing
-            const cacheBuster = new Date().getTime();
-            
-            // Targets the nested layout document slice, feeding parameters right past blocked wrapper elements
-            frame.src = `publication-web-resources/html/publication.html?page=${currentPage}&cb=${cacheBuster}`;
-            
-            // Manage arrow button scale layouts at extremes
-            prevBtn.style.opacity = (currentPage === 1) ? "0.3" : "1";
-            nextBtn.style.opacity = (currentPage === totalPages) ? "0.3" : "1";
+        for (let i = 1; i <= totalPages; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `Page ${i} of ${totalPages}`;
+            dropdown.appendChild(opt);
         }
 
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                turnToPage(currentPage - 1);
+        function updateCatalogView(newPage) {
+            currentPage = parseInt(newPage);
+            dropdown.value = currentPage;
+            
+            // Uses InDesign's high-res sequential fallback images inside publication-web-resources
+            const cleanPath = `publication-web-resources/image/page-${currentPage}.jpg`;
+            const cacheBuster = new Date().getTime();
+            
+            catalogueImg.src = `${cleanPath}?cb=${cacheBuster}`;
+            
+            prevBtn.disabled = (currentPage === 1);
+            nextBtn.disabled = (currentPage === totalPages);
+        }
+
+        leftZone.addEventListener('click', () => {
+            if (currentPage > 1) updateCatalogView(currentPage - 1);
+        });
+
+        rightZone.addEventListener('click', () => {
+            if (currentPage < totalPages) updateCatalogView(currentPage + 1);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentPage < totalPages) updateCatalogView(currentPage + 1);
+            } else if (e.key === 'ArrowLeft') {
+                if (currentPage > 1) updateCatalogView(currentPage - 1);
             }
         });
 
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                turnToPage(currentPage + 1);
-            }
-        });
+        dropdown.addEventListener('change', (e) => updateCatalogView(e.target.value));
+        prevBtn.addEventListener('click', () => currentPage > 1 && updateCatalogView(currentPage - 1));
+        nextBtn.addEventListener('click', () => currentPage < totalPages && updateCatalogView(currentPage + 1));
 
-        // Initialize display properties 
-        turnToPage(1);
+        updateCatalogView(1);
     </script>
 
 </body>
