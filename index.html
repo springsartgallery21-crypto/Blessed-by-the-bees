@@ -34,7 +34,6 @@
             position: relative;
             overflow: hidden;
         }
-        /* Fixed workspace wrapper matching your exact InDesign project size */
         .frame-scaler {
             width: 1080px;
             height: 1080px;
@@ -116,7 +115,6 @@
             <div id="left-zone" class="click-zone"></div>
             <div id="right-zone" class="click-zone"></div>
             
-            <!-- Scales content proportionally with smooth rendering mechanics -->
             <div id="scaler-wrapper" class="frame-scaler">
                 <iframe id="catalogue-frame" src="" title="Exhibition Catalogue Sheet"></iframe>
             </div>
@@ -148,19 +146,13 @@
             dropdown.appendChild(opt);
         }
 
-        // Native viewport layout calculation engine without touching iframe internal scopes
         function resizeCatalogue() {
             const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight * 0.86; // 86vh
-            
+            const viewportHeight = window.innerHeight * 0.86;
             const nativeSize = 1080;
-            
             const scaleX = viewportWidth / nativeSize;
             const scaleY = viewportHeight / nativeSize;
-            
-            // Keeps a safety gap padding layout buffer around borders
             const idealScale = Math.min(scaleX, scaleY) * 0.95; 
-            
             scalerWrapper.style.transform = `scale(${idealScale})`;
         }
 
@@ -177,6 +169,40 @@
             prevBtn.disabled = (currentPage === 1);
             nextBtn.disabled = (currentPage === totalPages);
         }
+
+        // FORCE SHARPNESS SCRIPT INJECTION
+        catalogueFrame.addEventListener('load', () => {
+            try {
+                const doc = catalogueFrame.contentDocument || catalogueFrame.contentWindow.document;
+                
+                // Remove internal iframe scrollbars completely
+                doc.body.style.overflow = "hidden";
+                
+                // Find all image tags inside the InDesign page
+                const images = doc.getElementsByTagName('img');
+                
+                for (let img of images) {
+                    // Check if it's an artwork image (ignoring tiny icons or backgrounds if any)
+                    if (img.offsetWidth > 100 || img.offsetHeight > 100) {
+                        // Reset hardcoded HTML/CSS rendering compression locks
+                        img.style.width = "auto";
+                        img.style.height = "auto";
+                        img.style.maxWidth = "100%";
+                        img.style.maxHeight = "100%";
+                        
+                        // Force modern high-fidelity rendering methods
+                        img.style.imageRendering = "-webkit-optimize-contrast";
+                        img.style.imageRendering = "crisp-edges";
+                        img.style.imageRendering = "quality";
+                        
+                        // Prevent browser blurring caused by subpixel layer offsets
+                        img.style.transform = "translateZ(0)";
+                    }
+                }
+            } catch (e) {
+                console.warn("Security policy blocked iframe asset adjustment. Run via Live Server.");
+            }
+        });
 
         window.addEventListener('resize', resizeCatalogue);
         leftZone.addEventListener('click', () => currentPage > 1 && updateCatalogView(currentPage - 1));
@@ -195,7 +221,6 @@
         prevBtn.addEventListener('click', () => currentPage > 1 && updateCatalogView(currentPage - 1));
         nextBtn.addEventListener('click', () => currentPage < totalPages && updateCatalogView(currentPage + 1));
 
-        // Initialization execution loop
         resizeCatalogue();
         updateCatalogView(1);
     </script>
