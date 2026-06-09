@@ -42,7 +42,6 @@
             object-fit: contain;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             border-radius: 4px;
-            transition: transform 0.2s ease;
         }
         /* Full-screen navigation hitboxes overlay layout layer */
         .click-zone {
@@ -121,7 +120,7 @@
             <div id="right-zone" class="click-zone"></div>
             
             <!-- High-Performance Universal Centered Layout Core -->
-            <img id="catalogue-img" src="publication-web-resources/image/page (1).jpg" alt="Exhibition Catalogue Page">
+            <img id="catalogue-img" src="" alt="Exhibition Catalogue Page">
         </div>
 
         <div class="nav-controls">
@@ -154,11 +153,17 @@
             currentPage = parseInt(newPage);
             dropdown.value = currentPage;
             
+            // Build the path matching your InDesign subfolder file names
+            const pathString = `publication-web-resources/image/page (${currentPage}).jpg`;
+            
+            // Forces characters like spaces and brackets to encode properly for mobile browsers
+            const cleanPath = encodeURI(pathString);
+            
             // Generate a unique token string value to eliminate phone image caching errors permanently
             const cacheBuster = new Date().getTime();
             
-            // Paths directly point into your high-res InDesign image asset subfolder cleanly
-            catalogueImg.src = `publication-web-resources/image/page (${currentPage}).jpg?cb=${cacheBuster}`;
+            // Update the image source securely
+            catalogueImg.src = `${cleanPath}?cb=${cacheBuster}`;
             
             // Set up button visibility toggle markers safely
             prevBtn.disabled = (currentPage === 1);
