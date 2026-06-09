@@ -43,7 +43,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             border-radius: 4px;
         }
-        /* Full-screen navigation hitboxes overlay layout layer */
         .click-zone {
             position: absolute;
             top: 0;
@@ -97,7 +96,6 @@
             cursor: pointer;
             outline: none;
         }
-        /* Mobile Spacing Calibration Adjustments */
         @media (max-width: 768px) {
             #viewport-container {
                 height: 76vh;
@@ -115,11 +113,8 @@
 
     <div id="main-container">
         <div id="viewport-container">
-            <!-- Left and Right Hidden Click-To-Turn Tap Overlays -->
             <div id="left-zone" class="click-zone"></div>
             <div id="right-zone" class="click-zone"></div>
-            
-            <!-- High-Performance Universal Centered Layout Core -->
             <img id="catalogue-img" src="" alt="Exhibition Catalogue Page">
         </div>
 
@@ -141,7 +136,6 @@
         const leftZone = document.getElementById('left-zone');
         const rightZone = document.getElementById('right-zone');
 
-        // Dynamically build selection elements from Page 1 to 17
         for (let i = 1; i <= totalPages; i++) {
             let opt = document.createElement('option');
             opt.value = i;
@@ -153,33 +147,24 @@
             currentPage = parseInt(newPage);
             dropdown.value = currentPage;
             
-            // Build the path matching your InDesign subfolder file names
-            const pathString = `publication-web-resources/image/page (${currentPage}).jpg`;
-            
-            // Forces characters like spaces and brackets to encode properly for mobile browsers
-            const cleanPath = encodeURI(pathString);
-            
-            // Generate a unique token string value to eliminate phone image caching errors permanently
+            // Fixed reference path pattern to map native InDesign file structures (page-1.jpg)
+            const cleanPath = `publication-web-resources/image/page-${currentPage}.jpg`;
             const cacheBuster = new Date().getTime();
             
-            // Update the image source securely
             catalogueImg.src = `${cleanPath}?cb=${cacheBuster}`;
             
-            // Set up button visibility toggle markers safely
             prevBtn.disabled = (currentPage === 1);
             nextBtn.disabled = (currentPage === totalPages);
         }
 
-        // Tap/Click navigation handling over display view overlays
-        leftZone.addEventListener('click', (e) => {
+        leftZone.addEventListener('click', () => {
             if (currentPage > 1) updateCatalogView(currentPage - 1);
         });
 
-        rightZone.addEventListener('click', (e) => {
+        rightZone.addEventListener('click', () => {
             if (currentPage < totalPages) updateCatalogView(currentPage + 1);
         });
 
-        // Horizontal Keyboard arrow keys navigation logic configuration arrays
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') {
                 if (currentPage < totalPages) updateCatalogView(currentPage + 1);
@@ -188,12 +173,10 @@
             }
         });
 
-        // Native control event triggers
         dropdown.addEventListener('change', (e) => updateCatalogView(e.target.value));
         prevBtn.addEventListener('click', () => currentPage > 1 && updateCatalogView(currentPage - 1));
         nextBtn.addEventListener('click', () => currentPage < totalPages && updateCatalogView(currentPage + 1));
 
-        // Start initialization configuration rules
         updateCatalogView(1);
     </script>
 
