@@ -12,22 +12,36 @@
             height: 100%;
             background-color: #111111;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        iframe {
+        #viewport-container {
             width: 100%;
             height: 100%;
-            border: none;
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        /* Forces your native InDesign layout elements to fill the screen, center, and unlock touch navigation */
+        .publication-content {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100vw;
+            max-height: 100vh;
+            object-fit: contain;
         }
     </style>
 </head>
 <body>
 
-    <!-- 
-      Routes directly to your InDesign publication layout file 
-      located inside the nested web-resource folder path
-    -->
-    <iframe src="publication-web-resources/html/publication.html"></iframe>
+    <div id="viewport-container">
+        <!-- Connects your native resource folder directly into the webpage without blocking clicks -->
+        <object data="publication-web-resources/html/publication.html" type="text/html" class="publication-content">
+            <embed src="publication-web-resources/html/publication.html" type="text/html" class="publication-content" />
+        </object>
+    </div>
 
 </body>
 </html>
